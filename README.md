@@ -1,5 +1,7 @@
+# CrossOver (De-Trial'd)
 Credit goes to [ellsies](https://gist.github.com/ellsies)
-Resourced for the purpose of finding this easier (and for myself.).
+
+(The script isn't modified, at all. You can eye-for-eye the revisions of the original creator and clearly see that, and I don't think I'll ever modify the code; If it ain't broke, don't fix it.)
 
 # HOW TO USE
 Open Terminal on Mac (LaunchPad -> Search -> Terminal)
