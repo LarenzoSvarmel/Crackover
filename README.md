@@ -9,6 +9,11 @@ The *new* version by [totallynotinteresting](https://gist.github.com/totallynoti
 This version worked just fine as-is, and I also wanna find it easier so I just put it here.
 
 # HOW TO USE
+
+Make sure you have brew installed
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 Open Terminal on Mac (LaunchPad -> Search -> Terminal)
 
 ```bash
@@ -16,3 +21,5 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/LarenzoSvarmel/Crackover
 ```
 If you're having trouble with pidof, install macports at https://www.macports.org/install.php then use: 
 ```sudo port install pidof```
+
+After a successful install, the script does the rest.
