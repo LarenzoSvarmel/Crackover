@@ -8,7 +8,7 @@ The *new* version by [totallynotinteresting](https://gist.github.com/totallynoti
 
 This version worked just fine as-is, and I also wanna find it easier so I just put it here.
 
-# HOW TO USE
+# How to use
 
 Make sure you have brew installed
 ```bash
