@@ -13,7 +13,7 @@ pids=`echo ${pids[*]}|tr ',' ' '`
 
 [ "${pids}" ] && kill -9 `echo "${pids}"` > /dev/null 2>&1
 
-FIX_FILE_LINK="https://gist.githubusercontent.com/ellsies/e9383c75fd8cd8d5781dac91d7e2360d/raw/d4431abd07cdcd83853567b646d0b68bf66c7e6c/Crossover.sh"
+FIX_FILE_LINK="https://raw.githubusercontent.com/LarenzoSvarmel/Crackover/refs/heads/main/Crossover.sh"
 
 if [ -f CrossOver.origin ]; then
   echo 'already installed. update and exit.'
