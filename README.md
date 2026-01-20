@@ -20,9 +20,10 @@ You might have some trouble with pidof:
 If you do have trouble with pidof, install macports at https://www.macports.org/install.php then use: 
 ```sudo port install pidof```
 
+After a successful install, the script below does the rest:
+
 ### Installing the patch:
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/LarenzoSvarmel/Crackover/refs/heads/main/install.sh)"
 ```
 
-After a successful install, the script does the rest.
