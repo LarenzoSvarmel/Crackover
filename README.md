@@ -18,7 +18,7 @@ Open Terminal on Mac (LaunchPad -> Search -> Terminal)
 
 You might have some trouble with pidof: 
 If you do have trouble with pidof, install macports at https://www.macports.org/install.php then use: 
-```sudo port install pidof`
+```sudo port install pidof```
 
 ### Installing the patch:
 ```bash
