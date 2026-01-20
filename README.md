@@ -20,6 +20,8 @@ You might have some trouble with pidof:
 If you do have trouble with pidof, install macports at https://www.macports.org/install.php then use: 
 ```sudo port install pidof```
 
+(It works just the same as the brew version)
+
 After a successful install, the script below does the rest:
 
 ### Installing the patch:
