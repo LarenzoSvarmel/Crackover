@@ -1,60 +1,51 @@
 #!/usr/bin/env bash
 
-set -euo pipefail  # exit on errors, undefined vars, bad pipe returns
+# checck if pidof exists
+PIDOF="$(which pidof)"
+# and if not - install it
+(test "${PIDOF}" && test -f "${PIDOF}") || brew install pidof
 
-# Check/install pidof if missing (optional – pgrep usually works fine on macOS)
-if ! command -v pidof >/dev/null 2>&1; then
-    echo "Installing pidof via brew..."
-    brew install pidof || { echo "brew install failed – continuing without pidof"; }
-fi
-
-# Find CrossOver binary path
+# find app in default paths
 CO_PWD=~/Applications/CrossOver.app/Contents/MacOS
-[[ -d "$CO_PWD" ]] || CO_PWD=/Applications/CrossOver.app/Contents/MacOS
+test -d "${CO_PWD}" || CO_PWD=/Applications/CrossOver.app/Contents/MacOS
 
-if [[ ! -d "$CO_PWD" ]]; then
-    echo "Could not find CrossOver.app in ~/Applications or /Applications. Exiting."
-    exit 1
-fi
+test -d "${CO_PWD}" || (echo 'unable to detect app path. exiting...' && exit)
 
-cd "$CO_PWD" || exit 1
+PWD="${CO_PWD}"
+cd "${PWD}"
 
-PROC_NAME="CrossOver"
+PROC_NAME='CrossOver'
 
-# Collect PIDs (using safer methods)
-pids=()
-while IFS= read -r pid; do [[ $pid =~ ^[0-9]+$ ]] && pids+=("$pid"); done < <(pgrep "$PROC_NAME")
-while IFS= read -r pid; do [[ $pid =~ ^[0-9]+$ ]] && pids+=("$pid"); done < <(pidof "$PROC_NAME" 2>/dev/null)
-# Last fallback – usually not needed
-ps -Ac | grep -m1 "$PROC_NAME" | awk '{print $1}' | while read -r pid; do pids+=("$pid"); done
+# get all pids of CrossOver
+pids=(`pgrep "${PROC_NAME}"`, `pidof "${PROC_NAME}"`, `ps -Ac | grep -m1 "${PROC_NAME}" | awk '{print $1}'`)
+pids=`echo ${pids[*]}|tr ',' ' '`
 
-# Remove duplicates and kill
-if [[ ${#pids[@]} -gt 0 ]]; then
-    printf "Killing CrossOver processes: %s\n" "${pids[*]}"
-    kill -9 "${pids[@]}" 2>/dev/null || true
-    sleep 4
-fi
+# kills CrossOver process if it is running
+[ "${pids}" ] && kill -9 `echo "${pids}"` > /dev/null 2>&1
 
-# Set date to 3 hours ago (UTC, RFC3339)
-DATETIME=$(date -u -v-3H '+%Y-%m-%dT%TZ')
-echo "Setting trial dates to: $DATETIME"
+# wait until app finish
+sleep 3
 
-plutil -replace FirstRunDate  -date "$DATETIME" ~/Library/Preferences/com.codeweavers.CrossOver.plist
-plutil -replace SULastCheckTime -date "$DATETIME" ~/Library/Preferences/com.codeweavers.CrossOver.plist
+# make the current date RFC3339-encoded string representation in UTC time zone
+DATETIME=`date -u -v -3H  '+%Y-%m-%dT%TZ'`
 
-osascript -e "display notification \"Trial dates reset to $DATETIME\" with title \"CrossOver Fix\""
+# modify time in order to reset trial
+plutil -replace FirstRunDate -date "${DATETIME}" ~/Library/Preferences/com.codeweavers.CrossOver.plist
+plutil -replace SULastCheckTime -date "${DATETIME}" ~/Library/Preferences/com.codeweavers.CrossOver.plist
 
-# Clean [Software\CodeWeavers\CrossOver\cxoffice] sections from system.reg
-# Use correct escaping for BSD sed
-find ~/Library/Application\ Support/CrossOver/Bottles -type f -name system.reg -print0 | while IFS= read -r -d '' file; do
-    sed -i '' '/^\[Software\\CodeWeavers\\CrossOver\\cxoffice\]/,+6d' "$file"
+# show tooltip notification 
+/usr/bin/osascript -e "display notification \"trial fixed: date changed to ${DATETIME}\""
+
+for file in ~/Library/Application\ Support/CrossOver/Bottles/*/system.reg; do 
+  sed -i -e "/^\\[Software\\\\\\\\CodeWeavers\\\\\\\\CrossOver\\\\\\\\cxoffice\\]/,+6d" "${file}";
 done
 
-# Remove .update-timestamp files (and optionally .eval if present)
-find ~/Library/Application\ Support/CrossOver/Bottles -type f \( -name ".update-timestamp" -o -name ".eval" \) -delete
+# This loop finds and deletes .update-timestamp files in each bottle
+for update_file in ~/Library/Application\ Support/CrossOver/Bottles/*/.update-timestamp; do 
+  rm -f "${update_file}"
+done
 
-osascript -e 'display notification "Bottles cleaned – timestamps & eval files removed" with title "CrossOver Fix"'
+/usr/bin/osascript -e "display notification \"bottles fixed: all timestamps removed\""
 
-# Launch original binary (assuming you renamed it to CrossOver.origin)
-echo "Launching: $CO_PWD/CrossOver.origin"
-"$CO_PWD/CrossOver.origin" >> /tmp/co_log.log 2>&1
+# and after this execute original crossover
+echo "${PWD}" > /tmp/co_log.log
